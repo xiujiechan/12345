@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from datetime import datetime
-from scrape import scrape_stocks
+from scrape import scrape_stocks, scrape_pm25
 
 # print(__name__)
 
@@ -23,13 +23,12 @@ books = {
         "image_url": "https://im1.book.com.tw/image/getImage?i=https://www.books.com.tw/img/001/036/04/0010360466.jpg&v=62d695bak&w=348&h=348",
     },
 }
+today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 @app.route("/")
 def index():
     name = "PinLing"
-    today = datetime.now().strftime("%Y-%m-%d %H:%M")
-    print(today)
     # return f"<h1>Hello Flask!</h1><h2>Hi Flask!</h2><h3>How are you Flask?</h3><h4>Flask {today}!</h4>"
     return render_template("index.html", date=today, name=name)
 
@@ -73,9 +72,19 @@ def getBmi(name, height, weight):
 def get_stocks():
     try:
         datas = scrape_stocks()
-
         return render_template("stocks.html", datas=datas)
 
+    except Exception as e:
+        print(e)
+        return "<h2 style='color:red'>錯誤</h2>"
+
+
+@app.route("/pm25")
+def get_PM():
+    try:
+        columns, values = scrape_pm25()
+        data = {"columns": columns, "values": values, "today": today}
+        return render_template("pm25.html", data=data)
     except Exception as e:
         print(e)
         return "<h2 style='color:red'>錯誤</h2>"
