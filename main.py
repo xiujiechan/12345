@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from datetime import datetime
+from scrape import scrape_stocks
 
 # print(__name__)
 
@@ -26,7 +27,7 @@ books = {
 
 @app.route("/")
 def index():
-    name = "Jerry"
+    name = "PinLing"
     today = datetime.now().strftime("%Y-%m-%d %H:%M")
     print(today)
     # return f"<h1>Hello Flask!</h1><h2>Hi Flask!</h2><h3>How are you Flask?</h3><h4>Flask {today}!</h4>"
@@ -66,6 +67,18 @@ def getBmi(name, height, weight):
     except Exception as e:
         print(e)
         return "<h2 style='color:red'>輸入參數錯誤</h2>"
+
+
+@app.route("/stocks")
+def get_stocks():
+    try:
+        datas = scrape_stocks()
+
+        return render_template("stocks.html", datas=datas)
+
+    except Exception as e:
+        print(e)
+        return "<h2 style='color:red'>錯誤</h2>"
 
 
 app.run(debug=True)
