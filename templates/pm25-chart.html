@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        #main {
+            display: inline-block;
+            width: 1024px;
+            height: 600px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+</head>
+
+<body>
+    <h1>PM2.5圖形繪製</h1>
+
+    <div id="main"></div>
+    <script>
+
+        $.ajax(
+            {
+                url: "/pm25-data",
+                type: "GET",
+                dataType: "json",
+                success: (data) => {
+                    console.log(data);
+                    drawChart(myChart, data['site'], data['pm25'], "各縣市PM2.5濃度", "pm2.5濃度")
+
+                }
+            }
+        );
+
+        var myChart = echarts.init(document.getElementById('main'));
+
+        function drawChart(chart, xdata, ydata, title = "Chart Title", name = "數值") {
+            var option = {
+                title: {
+                    text: title
+                },
+                tooltip: {},
+                legend: {
+                    data: [name]
+                },
+                xAxis: {
+                    data: xdata
+                },
+                yAxis: {},
+                series: [
+                    {
+                        name: name,
+                        type: 'bar',
+                        data: ydata
+                    }
+                ]
+            };
+
+            chart.setOption(option);
+        }
+
+
+    </script>
+
+</body>
+
+</html>

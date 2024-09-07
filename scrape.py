@@ -43,5 +43,14 @@ def scrape_pm25(sort=False, ascending=True):
     return None, 404
 
 
+def get_pm25_json():
+    values = scrape_pm25()[1]
+    xdata = [value[0] for value in values]
+    ydata = [value[2] for value in values]
+
+    json_data = {"site": xdata, "pm25": ydata}
+    return json_data
+
+
 if __name__ == "__main__":
-    print(scrape_pm25(sort=False, ascending=False))
+    print(get_pm25_json())
