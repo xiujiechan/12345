@@ -11,6 +11,12 @@
             background-color: rgb(170, 170, 205);
         }
 
+        .reload {
+            background-color: rgb(190, 190, 240);
+            margin: 5px auto;
+            padding: 10px;
+        }
+
         .info {
             width: 60%;
             border-collapse: collapse;
@@ -46,6 +52,10 @@
         </select>
         <button type="submit">排序</button>
     </form>
+    <div class="reload">
+        <input type="checkbox" name="check-reload" id="check-reload">開啟自動更新，
+        每<input type="number" id="reload-second" value="30">秒更新一次
+    </div>
     <a href="/">回首頁</a>
     <a href="">重新讀取</a>
     <table border="1" class="info">
@@ -66,6 +76,37 @@
             {% endfor %}
         </tbody>
     </table>
+    <script>
+        const checkReload = document.querySelector("#check-reload");
+        const reloadSecond = document.querySelector("#reload-second");
+        const delaySecond = "30";
+
+        // window.onload = () => {
+        //     checkReload.checked = localStorage.getItem('CheckReload') ? true : false;
+        //     reloadSecond.value = localStorage.getItem('CheckReload') ? localStorage.getItem('CheckReload') : delaySecond;
+        //     SetUpdateInterval()
+        // };
+
+        checkReload.addEventListener("change", () => {
+            // 儲存
+            localStorage.setItem('CheckReload', checkReload.checked);
+            localStorage.setItem('ReloadSecond', reloadSecond.value);
+            SetUpdateInterval();
+
+        });
+
+        function SetUpdateInterval() {
+            if (checkReload.checked) {
+                console.log("start reload!")
+                setInterval((() => {
+                    window.location.reload();
+                }), Number(reloadSecond.value) * 1000);
+            }
+        }
+
+    </script>
+
+
 </body>
 
 </html>
