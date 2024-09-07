@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from datetime import datetime
 from scrape import scrape_stocks, scrape_pm25
 
@@ -81,8 +81,13 @@ def get_stocks():
 
 @app.route("/pm25")
 def get_PM():
+    sort = False
+    ascending = True
     try:
-        columns, values = scrape_pm25()
+        if "sort" in request.args:
+            sort = True
+            ascending = True if request.args.get("sort") == "true" else False
+        columns, values = scrape_pm25(sort, ascending)
         data = {"columns": columns, "values": values, "today": today}
         return render_template("pm25.html", data=data)
     except Exception as e:
