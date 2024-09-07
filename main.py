@@ -79,14 +79,19 @@ def get_stocks():
         return "<h2 style='color:red'>錯誤</h2>"
 
 
-@app.route("/pm25")
+@app.route("/pm25", methods=["GET", "POST"])
 def get_PM():
     sort = False
     ascending = True
+    # GET
+    print(request.args)
+    # POST
+    print(request.form)
     try:
-        if "sort" in request.args:
-            sort = True
-            ascending = True if request.args.get("sort") == "true" else False
+        if request.method == "POST":
+            if "sort" in request.form:
+                sort = True
+                ascending = True if request.form.get("sort") == "true" else False
         columns, values = scrape_pm25(sort, ascending)
         data = {"columns": columns, "values": values, "today": today}
         return render_template("pm25.html", data=data)
