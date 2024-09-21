@@ -5,26 +5,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <style>
-        body {
-            text-align: center;
-        }
 
-        #main {
-            display: inline-block;
-            width: 1024px;
-            height: 600px;
-        }
-    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <style>
+        .higher {
+            background-color: red(134, 23, 23);
+            width: 200px;
+            text-align: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .lower {
+            background-color: green(134, 23, 23);
+            width: 200px;
+            text-align: center;
+            color: white;
+            font-size: 24px;
+        }
+    </style>
 </head>
 
 <body>
+    <a href="/">回首頁</a>
+    <div>
+        最高:<span id="highestSite"></span>
+        <span id="highestPm25"></span>
+    </div>
+    <div>
+        最低:<span id="LowestSite"></span>
+        <span id="LowestPm25"></span>
+    </div>
+
     <h1>PM2.5圖形繪製</h1>
 
-    <div id="main"></div>
+    <div id="main" style="width: 1024px;height:400px;"></div>
+    <div id="six" style="width: 1024px;height:400px;"></div>
     <script>
+        const chart1 = echarts.init(document.getElemntById('main'));
+        const chart2 = echarts.init(document.getElemntById('six'));
+
+        window.addEventListener.init("resize", () => {
+            chart1.resize();
+            chart2.resize();
+        });
 
         $.ajax(
             {
@@ -33,15 +58,29 @@
                 dataType: "json",
                 success: (data) => {
                     console.log(data);
-                    drawChart(myChart, data['site'], data['pm25'], "各縣市PM2.5濃度", "pm2.5濃度")
+                    drawChart(chart1, data['site'], data['pm25'], "各縣市PM2.5濃度", "pm2.5濃度")
+                    $("#highestSite").text(data["highest"][0]);
+                    $("#highestPm25").text(data["highest"][1]);
+                    $("#LowestSite").text(data["Lowest"][0]);
+                    $("#LowestPm25").text(data["Lowest"][1]);
 
                 }
             }
         );
+        $.ajax(
+            {
+                url: "/six-pm25-data",
+                type: "GET",
+                dataType: "json",
+                success: (data) => {
+                    console.log(data);
+                    drawChart(chart2, data['site'], data['pm25'], "各縣市PM2.5濃度", "pm2.5濃度")
+                    title = "六都pm2.5平均數據", "pm2.5", color = "#4b0082"
+                }
+            }
+        );
 
-        var myChart = echarts.init(document.getElementById('main'));
-
-        function drawChart(chart, xdata, ydata, title = "Chart Title", name = "數值") {
+        function drawChart(chart, xdata, ydata, title = "圖表", name = "數值") {
             var option = {
                 title: {
                     text: title
@@ -58,7 +97,10 @@
                     {
                         name: name,
                         type: 'bar',
-                        data: ydata
+                        data: ydata,
+                        itemStyle: {
+                            color: "green"
+                        }
                     }
                 ]
             };
