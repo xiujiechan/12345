@@ -1,75 +1,96 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PM2.5</title>
+    <title>PM2.5資訊</title>
     <style>
         body {
+            font-family: 標楷體;
+            background-color: antiquewhite;
             text-align: center;
-            background-color: rgb(170, 170, 205);
         }
 
-        .reload {
-            background-color: rgb(190, 190, 240);
-            margin: 5px auto;
-            padding: 10px;
-        }
-
-        .info {
+        table {
             width: 60%;
-            border-collapse: collapse;
-            border-width: 5px;
-            border-color: rgb(200, 255, 255);
-            background-color: rgb(45, 55, 90);
-            color: rgb(255, 250, 235);
-            font-size: 20px;
-            margin: 0px auto;
-            padding: 50px;
+            margin: 0 auto;
         }
 
-        .info thead {
-            background-color: rgb(20, 5, 30);
+        th {
+            background-color: rgb(119, 111, 255);
+            color: white;
+        }
+
+        td {
+            background-color: rgba(190, 219, 244, 0.92);
         }
 
         @media screen and (max-width:1024px) {
             table {
                 width: 90%;
             }
+        }
 
+        #reload-sec {
+            width: 50px;
+
+        }
+
+        .panel1 {
+            width: 200px;
+            margin: 3px auto;
+            background-color: orange;
+            padding: 6px;
+            border-radius: 3px;
+        }
+
+        .button-style {
+            background-color: rgb(100, 110, 180);
+            border: 0;
+            width: 50px;
+            border-radius: 3px;
+        }
+
+        form {
+            margin: 6px 0px;
         }
     </style>
 </head>
 
 <body>
-    <h2>全省PM2.5資訊</h2>
-    <h3>目前時間:{{data['today']}}</h3>
-    <form action="" method="POST">
-        <select name="sort" id="sort">
-            <option value="true">低→高</option>
-            <option value="false">高→低</option>
-        </select>
-        <button type="submit">排序</button>
-    </form>
-    <div class="reload">
-        <input type="checkbox" name="check-reload" id="check-reload">開啟自動更新，
-        每<input type="number" id="reload-second" value="30">秒更新一次
-    </div>
+    <h1>全省PM2.5資訊</h1>
+    <h3 style="color:blue">目前時間:<u>{{data["today"]}}</u></h3>
     <a href="/">回首頁</a>
     <a href="">重新讀取</a>
-    <table border="1" class="info">
+
+    <div class="panel1">
+        <input type="checkbox" name="" id="check-reload">
+        開啟
+        <input name="" id="reload-sec" type="number">秒數
+        <form action="" method="POST">
+            <select name="sort" id="sort">
+                <option value="true">升</option>
+                <option value="false">降</option>
+            </select>
+            <button class="button-style" type="submit">排序</button>
+        </form>
+    </div>
+
+
+    <table border="1">
         <thead>
             <tr>
-                {% for th in data["columns"]%}
+                {% for th in data["columns"] %}
                 <th>{{th}}</th>
                 {% endfor %}
             </tr>
         </thead>
         <tbody>
-            {% for tr in data["values"]%}
+            {% for tr in data["values"] %}
             <tr>
-                {% for td in tr%}
+                {% for td in tr %}
                 <td>{{td}}</td>
                 {% endfor %}
             </tr>
@@ -78,42 +99,49 @@
     </table>
     <script>
         const checkReload = document.querySelector("#check-reload");
-        const reloadSecond = document.querySelector("#reload-second");
-        const delaySecond = 30;
+        const reloadSecond = document.querySelector("#reload-sec");
+        const delaySecond = 60;
 
-        window.onload = () => {
-            checkReload.checked = sessionStorage.getItem('CheckReload') == "true";
-            reloadSecond.value = sessionStorage.getItem('ReloadSecond') ? sessionStorage.getItem('ReloadSecond') : delaySecond;
+
+        window.onload = function () {
+            console.log("reload!");
+            //讀取
+            checkReload.checked = sessionStorage.getItem("CheckReload") == "true";
+            reloadSecond.value = sessionStorage.getItem("ReloadSecond") ? sessionStorage.getItem("ReloadSecond")
+                : delaySecond;
+
             SetUpdateInterval();
         };
 
-        reloadSecond.addEventListener("input", () => {
-            console.log("input!");
-            checkReload.checked = false;
-            sessionStorage.setItem('ReloadSecond', reloadSecond.value);
-            sessionStorage.setItem('CheckReload', checkReload.checked);
-        })
-
         checkReload.addEventListener("change", () => {
-            console.log("change!");
-            sessionStorage.setItem('CheckReload', checkReload.checked);
+            //儲存         
+            sessionStorage.setItem("CheckReload", checkReload.checked);
             SetUpdateInterval();
         });
 
-        let intervalID = null;
+        reloadSecond.addEventListener("input", () => {
+            checkReload.checked = false;
+            sessionStorage.setItem("CheckReload", checkReload.checked);
+            sessionStorage.setItem("ReloadSecond", reloadSecond.value);
+        });
+
+        let intervalId = null;
         function SetUpdateInterval() {
             if (checkReload.checked) {
                 console.log("start reload!");
-                intervalID = setInterval((() => {
+                let sec = Number(reloadSecond.value) * 1000;
+                // 取得對應Interval id
+                intervalId = setInterval((() => {
                     window.location.reload();
-                }), Number(reloadSecond.value) * 1000);
+                }), sec);
             } else {
-                clearInterval(intervalID);
+                // 清除Interval
+                clearInterval(intervalId);
             }
         }
 
-    </script>
 
+    </script>
 </body>
 
 </html>

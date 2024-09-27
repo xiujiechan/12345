@@ -4,49 +4,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
+    <title>PM25-Chart</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+
     <style>
         .higher {
-            background-color: red(134, 23, 23);
+            background-color: rgb(134, 25, 25);
             width: 200px;
             text-align: center;
-            color: white;
+            color: rgb(204, 179, 179);
             font-size: 24px;
         }
 
         .lower {
-            background-color: green(134, 23, 23);
+            background-color: rgb(0, 183, 79);
             width: 200px;
             text-align: center;
-            color: white;
+            color: rgb(204, 179, 179);
             font-size: 24px;
         }
     </style>
+
 </head>
 
 <body>
+    
     <a href="/">回首頁</a>
-    <div>
+    <h1>PM2.5圖形繪製</h1>
+    <div class="higher">
         最高:<span id="highestSite"></span>
         <span id="highestPm25"></span>
     </div>
-    <div>
-        最低:<span id="LowestSite"></span>
-        <span id="LowestPm25"></span>
+
+    <div class="lower">
+        最低:<span id="lowestSite"></span>
+        <span id="lowestPm25"></span>
     </div>
 
-    <h1>PM2.5圖形繪製</h1>
+    <a href="">更新數據</a>
 
-    <div id="main" style="width: 1024px;height:400px;"></div>
-    <div id="six" style="width: 1024px;height:400px;"></div>
+    <div id="main" style="width: 100%;height:400px;"></div>
+    <div id="six" style="width: 100%;height:400px;"></div>
     <script>
-        const chart1 = echarts.init(document.getElemntById('main'));
-        const chart2 = echarts.init(document.getElemntById('six'));
+        const chart1 = echarts.init(document.getElementById('main'));
+        const chart2 = echarts.init(document.getElementById('six'));
 
-        window.addEventListener.init("resize", () => {
+        window.addEventListener("resize", () => {
             chart1.resize();
             chart2.resize();
         });
@@ -58,15 +62,16 @@
                 dataType: "json",
                 success: (data) => {
                     console.log(data);
-                    drawChart(chart1, data['site'], data['pm25'], "各縣市PM2.5濃度", "pm2.5濃度")
+                    drawChart(chart1, data["site"], data["pm25"], title = "全台pm2.5數據", "pm2.5");
+
                     $("#highestSite").text(data["highest"][0]);
                     $("#highestPm25").text(data["highest"][1]);
-                    $("#LowestSite").text(data["Lowest"][0]);
-                    $("#LowestPm25").text(data["Lowest"][1]);
-
+                    $("#lowestSite").text(data["lowest"][0]);
+                    $("#lowestPm25").text(data["lowest"][1]);
                 }
             }
         );
+
         $.ajax(
             {
                 url: "/six-pm25-data",
@@ -74,13 +79,13 @@
                 dataType: "json",
                 success: (data) => {
                     console.log(data);
-                    drawChart(chart2, data['site'], data['pm25'], "各縣市PM2.5濃度", "pm2.5濃度")
-                    title = "六都pm2.5平均數據", "pm2.5", color = "#4b0082"
+                    drawChart(chart2, data["site"], data["pm25"],
+                        title = "六都pm2.5平均數據", "pm2.5", color = "#1677b3");
                 }
             }
         );
 
-        function drawChart(chart, xdata, ydata, title = "圖表", name = "數值") {
+        function drawChart(chart, xdata, ydata, title = "圖表", name = "數值", color = "#2b2e77") {
             var option = {
                 title: {
                     text: title
@@ -99,7 +104,7 @@
                         type: 'bar',
                         data: ydata,
                         itemStyle: {
-                            color: "green"
+                            color: color
                         }
                     }
                 ]
@@ -110,9 +115,10 @@
 
 
     </script>
-    <br>
 
-    <a href="/">回首頁</a>
+
+
+
 </body>
 
 </html>

@@ -1,2 +1,39 @@
-gunicorn==23.0.0
-packaging==24.1
+[1]建立虛擬環境
+
+(base)/
+
+python -m venv flask_env    (寫成Django也可以 喜歡的名稱)
+
+
+[2]切換虛擬環境
+
+1.flask_env/Scrips/activate
+2.CTRL+SHIFT+P(選擇flask_env)
+
+
+[3]重新開啟終端機
+
+(flask_env)/
+[4]pip list確認環境套件乾淨
+
+
+[5]安裝必要套件
+pip install flask requests bs4 lxml pandas
+pip list
+
+[6]輸出套件版本號到requirements.txt
+pip freeze > requirements.txt
+
+[7]render
+github帳號
+
+
+gunicorn main:app
+
+
+
+git remote set-url origin git://new.url.here
+
+改成自己的github
+
+git remote set-url origin https://github.com/xiujiechan/12345.git

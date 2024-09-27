@@ -29,20 +29,23 @@ today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 @app.route("/")
 def index():
+    today = datetime.now()
+    print(today)
+    print("123")
     name = "xiujie"
     # return f"<h1>Hello Flask!</h1><h2>Hi Flask!</h2><h3>How are you Flask?</h3><h4>Flask {today}!</h4>"
     return render_template("index.html", date=today, name=name)
 
 
 @app.route("/books")
-def showBooks():
+def show_Books():
     for key in books:
         print(books[key])
     return render_template("books.html", books=books)
 
 
 @app.route("/book/<int:id>")
-def showBook(id):
+def show_Book(id):
     if id in books:
         return f"<h1 style='background-color:black; color:white'>編號{id}: {books[id]}</h1>"
     return f"<h1 style='color:red'>無此編號:{id}</h1>"
@@ -71,34 +74,40 @@ def getBmi(name, height, weight):
 
 @app.route("/stocks")
 def get_stocks():
-    try:
-        datas = scrape_stocks()
-        return render_template("stocks.html", datas=datas)
 
-    except Exception as e:
-        print(e)
-        return "<h2 style='color:red'>錯誤</h2>"
+    datas = scrape_stocks()
+    return render_template("stocks.html", datas=datas)
+
+    
+
 
 
 @app.route("/pm25", methods=["GET", "POST"])
-def get_PM():
-    sort = False
-    ascending = True
+def get_PM25():
+    
     # GET
     print(request.args)
     # POST
     print(request.form)
-    try:
-        if request.method == "POST":
-            if "sort" in request.form:
+    today = datetime.now()
+
+    sort = False
+    ascending = True
+
+    if request.method == "POST":
+        #判斷是否按下排序按鈕
+        if "sort" in request.form:
                 sort = True
                 ascending = True if request.form.get("sort") == "true" else False
-        columns, values = scrape_pm25(sort, ascending)
-        data = {"columns": columns, "values": values, "today": today}
-        return render_template("pm25.html", data=data)
-    except Exception as e:
-        print(e)
-        return "<h2 style='color:red'>錯誤</h2>"
+    
+    columns, values = scrape_pm25(sort, ascending)
+    data = {
+        "columns": columns,
+        "values": values, 
+        "today": today.strftime("%Y/%m/%d %H:%M:%S"),
+        }
+    return render_template("pm25.html", data=data)
+
     
 @app.route("/six-pm25-data")
 def six_pm25_data():
@@ -123,4 +132,5 @@ def pm25_data():
 def pm25_chart():
     return render_template("pm25-chart.html")
 
-app.run(debug=True)
+app.run(host="0.0.0.0")
+#app.run(debug=True)

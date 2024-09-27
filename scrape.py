@@ -27,20 +27,17 @@ def scrape_stocks():
         print(e)
     return None
 
-def convert_value(value):
-    try:
-        return eval(value)
-    except:
-        return None
+
 
 def scrape_pm25(sort=False, ascending=True):
     try:
         url = "https://data.moenv.gov.tw/api/v2/aqx_p_02?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=datacreationdate%20desc&format=JSON"
-        datas = requests.get(url).json()["records"]
-        df = pd.DataFrame(datas)
+        #datas = requests.get(url).json()["records"]
+        #df = pd.DataFrame(datas)
         # 將非正常數值轉換成None
-        df["pm25"] = df["pm25"].apply(convert_value)
-        df = df.dropna()
+        #df["pm25"] = df["pm25"].apply(convert_value)
+        #df = df.dropna()
+        df = get_pm25_deta()
         if sort:
             df = df.sort_values("pm25", ascending=ascending)
 
@@ -51,6 +48,13 @@ def scrape_pm25(sort=False, ascending=True):
     except Exception as e:
         print(e)
     return None, 404
+
+
+def convert_value(value):
+    try:
+        return eval(value)
+    except:
+        return None
 
 def get_pm25_deta():
     global df            #讀很快 不用讀兩次
@@ -66,13 +70,13 @@ def get_pm25_deta():
 
 
 def scrape_six_pm25():
-    six_countys = ["臺北市", "新北市", "桃園市", "臺中市", "臺南市", "高雄市"]
+    #six_countys = ["臺北市", "新北市", "桃園市", "臺中市", "臺南市", "高雄市"]
     pm25 = []
     try:
         df = get_pm25_deta()
         for county in six_countys:
             avg_pm25 = df.groupby("county").get_group(county)["pm25"].mean()
-            pm25.append(avg_pm25)
+            pm25.append(round(avg_pm25, 2))
 
         columns = six_countys
         values = pm25
@@ -105,13 +109,17 @@ def get_six_pm25_json():
 
 
 def get_pm25_json():
-    values = scrape_pm25()[1]
+    columns, values = scrape_pm25()
+
     xdata = [value[0] for value in values]   #各自一維
     ydata = [value[2] for value in values]   #排序之後
 
-    json_data = {"site": xdata, "pm25": ydata}
+
     datas = (list(zip(xdata,ydata)))
+
     datas = sorted(datas, key=lambda x: x[1])   #回傳最高最低兩個值
+    #json_data = {"site": xdata, "pm25": ydata, "highest":datas[-1],"lowest":datas[0]}
+
     #print(datas)
     json_data = {"site":xdata, "pm25":ydata, "highest":datas[-1],"lowest":datas[0]}
 
